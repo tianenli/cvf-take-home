@@ -1,0 +1,22 @@
+class CohortDetailSerializer < ActiveModel::Serializer
+  attributes :id, :fund_organization_id, :cohort_start_date, :status, :share_percentage,
+             :committed, :adjustment, :actual_spend, :cash_cap, :total_returned,
+             :prediction_scenarios, :thresholds,
+             :approved_at, :completed_at, :settled_at, :terminated_at,
+             :created_at, :updated_at, :progress_percentage, :organization_name, :fund_name
+
+  has_many :cohort_payments
+
+  def progress_percentage
+    return 0 if object.cash_cap.zero?
+    ((object.total_returned / object.cash_cap) * 100).round(2)
+  end
+
+  def organization_name
+    object.organization.name
+  end
+
+  def fund_name
+    object.fund.name
+  end
+end

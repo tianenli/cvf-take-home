@@ -1,0 +1,12 @@
+:concurrency: 5
+:queues:
+  - default
+  - scheduler
+  - mailers
+
+:schedule:
+  # Example: Daily cohort payment finalization at 2am
+  finalize_cohort_payments:
+    cron: '0 2 * * *'
+    class: FinalizeCohortPaymentsJob
+    queue: scheduler

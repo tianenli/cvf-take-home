@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Logs
+log/*
+tmp/*
+*.log
+
+# Dependencies
+node_modules
+frontend/node_modules
+
+# Environment
+.env
+.env.local
+
+# Docker
+Dockerfile*
+docker-compose.yml
+
+# Test
+test/
+spec/
+coverage/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
