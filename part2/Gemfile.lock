@@ -331,7 +331,7 @@ DEPENDENCIES
   store_model (~> 2.0)
 
 RUBY VERSION
-   ruby 3.2.0p0
+   ruby 3.2.9p0
 
 BUNDLED WITH
-   2.4.1
+   2.4.19
