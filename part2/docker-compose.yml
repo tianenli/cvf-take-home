@@ -41,6 +41,8 @@ services:
       - ./public:/app/public
       - ./tmp:/app/tmp
       - ./log:/app/log
+      - ./Gemfile:/app/Gemfile
+      - ./Gemfile.lock:/app/Gemfile.lock
       - bundle_cache:/usr/local/bundle
     ports:
       - "3000:3000"
@@ -69,6 +71,8 @@ services:
       - ./config:/app/config
       - ./db:/app/db
       - ./lib:/app/lib
+      - ./Gemfile:/app/Gemfile
+      - ./Gemfile.lock:/app/Gemfile.lock
       - bundle_cache:/usr/local/bundle
     depends_on:
       db:
@@ -93,6 +97,8 @@ services:
       - ./config:/app/config
       - ./db:/app/db
       - ./lib:/app/lib
+      - ./Gemfile:/app/Gemfile
+      - ./Gemfile.lock:/app/Gemfile.lock
       - bundle_cache:/usr/local/bundle
     depends_on:
       db:

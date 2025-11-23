@@ -1,21 +1,24 @@
 import { useQuery } from '@tanstack/react-query'
 import { organizationsApi, cohortsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
 import { Link } from 'react-router-dom'
 
-// For demo purposes, we'll use organization ID 1
-const ORGANIZATION_ID = 1
-
 export default function Dashboard() {
+  const { user } = useAuth()
+  const organizationId = user?.organization_id || 1
+
   const { data: organization } = useQuery({
-    queryKey: ['organization', ORGANIZATION_ID],
-    queryFn: () => organizationsApi.get(ORGANIZATION_ID).then((res) => res.data),
+    queryKey: ['organization', organizationId],
+    queryFn: () => organizationsApi.get(organizationId).then((res) => res.data),
+    enabled: !!user,
   })
 
   const { data: cohorts = [] } = useQuery({
-    queryKey: ['cohorts', ORGANIZATION_ID],
-    queryFn: () => cohortsApi.list(ORGANIZATION_ID).then((res) => res.data),
+    queryKey: ['cohorts', organizationId],
+    queryFn: () => cohortsApi.list(organizationId).then((res) => res.data),
+    enabled: !!user,
   })
 
   const stats = {

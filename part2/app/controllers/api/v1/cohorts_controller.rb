@@ -1,11 +1,12 @@
 module Api
   module V1
     class CohortsController < BaseController
-      before_action :set_organization
       before_action :set_cohort, only: [:show, :update, :approve, :complete, :terminate]
 
       def index
-        @cohorts = @organization.cohorts
+        authorize_organization!(params[:organization_id])
+
+        @cohorts = current_organization.cohorts
           .includes(:cohort_payments)
           .order(cohort_start_date: :desc)
 
@@ -38,12 +39,10 @@ module Api
 
       private
 
-      def set_organization
-        @organization = Organization.find(params[:organization_id])
-      end
-
       def set_cohort
-        @cohort = @organization.cohorts.find(params[:id])
+        authorize_organization!(params[:organization_id])
+        @cohort = current_organization.cohorts.find(params[:id])
+        authorize_cohort!(@cohort.id)
       end
 
       def cohort_params

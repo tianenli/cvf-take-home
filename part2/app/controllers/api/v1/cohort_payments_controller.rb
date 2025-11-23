@@ -1,7 +1,6 @@
 module Api
   module V1
     class CohortPaymentsController < BaseController
-      before_action :set_organization
       before_action :set_cohort
 
       def index
@@ -16,12 +15,10 @@ module Api
 
       private
 
-      def set_organization
-        @organization = Organization.find(params[:organization_id])
-      end
-
       def set_cohort
-        @cohort = @organization.cohorts.find(params[:cohort_id])
+        authorize_organization!(params[:organization_id])
+        @cohort = current_organization.cohorts.find(params[:cohort_id])
+        authorize_cohort!(@cohort.id)
       end
     end
   end

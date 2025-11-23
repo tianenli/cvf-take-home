@@ -13,6 +13,5 @@ class CreateTxns < ActiveRecord::Migration[7.1]
 
     add_index :txns, [:organization_id, :reference_id], unique: true
     add_index :txns, :payment_date
-    add_index :txns, :customer_id
   end
 end

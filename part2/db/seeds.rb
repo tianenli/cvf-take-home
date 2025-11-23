@@ -23,6 +23,16 @@ org = Organization.find_or_create_by!(name: 'Sample Tech Company')
 
 puts "Seeded organization: #{org.name}"
 
+# Create dashboard user for the organization
+dashboard_user = DashboardUser.find_or_create_by!(email: 'user@company.com') do |u|
+  u.organization = org
+  u.name = 'John Doe'
+  u.password = 'password'
+  u.password_confirmation = 'password'
+end
+
+puts "Seeded dashboard user: #{dashboard_user.email} / password (Organization: #{org.name})"
+
 # Create fund organization relationship
 fund_org = FundOrganization.find_or_create_by!(
   organization: org,
@@ -47,4 +57,32 @@ fund_org = FundOrganization.find_or_create_by!(
 end
 
 puts "Seeded fund organization relationship"
+
+# Create sample cohorts
+cohort1 = Cohort.find_or_create_by!(
+  fund_organization: fund_org,
+  cohort_start_date: Date.new(2024, 1, 1)
+) do |c|
+  c.share_percentage = 20.0
+  c.committed = 50_000
+  c.cash_cap = 75_000
+  c.status = 'active'
+  c.approved_at = Time.current
+end
+
+cohort2 = Cohort.find_or_create_by!(
+  fund_organization: fund_org,
+  cohort_start_date: Date.new(2024, 2, 1)
+) do |c|
+  c.share_percentage = 20.0
+  c.committed = 60_000
+  c.cash_cap = 90_000
+  c.status = 'active'
+  c.approved_at = Time.current
+end
+
+puts "Seeded #{Cohort.count} cohorts"
 puts "\nSeeding complete!"
+puts "\n=== Login Credentials ==="
+puts "Dashboard User: user@company.com / password"
+puts "Admin User: admin@cvf.com / password"

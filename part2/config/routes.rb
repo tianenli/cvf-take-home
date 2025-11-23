@@ -11,6 +11,11 @@ Rails.application.routes.draw do
   # API routes
   namespace :api do
     namespace :v1 do
+      # Authentication
+      post 'login', to: 'sessions#create'
+      delete 'logout', to: 'sessions#destroy'
+      get 'me', to: 'sessions#current'
+
       resources :organizations, only: [:index, :show] do
         resources :cohorts, only: [:index, :show, :update] do
           member do

@@ -1,18 +1,19 @@
 import { useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { cohortsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
 
-const ORGANIZATION_ID = 1
-
 export default function CohortDetail() {
   const { id } = useParams<{ id: string }>()
+  const { user } = useAuth()
+  const organizationId = user?.organization_id || 1
 
   const { data: cohort, isLoading } = useQuery({
-    queryKey: ['cohort', ORGANIZATION_ID, id],
-    queryFn: () => cohortsApi.get(ORGANIZATION_ID, Number(id!)).then((res) => res.data),
-    enabled: !!id,
+    queryKey: ['cohort', organizationId, id],
+    queryFn: () => cohortsApi.get(organizationId, Number(id!)).then((res) => res.data),
+    enabled: !!id && !!user,
   })
 
   if (isLoading) {

@@ -1,24 +1,26 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { cohortsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
 
-const ORGANIZATION_ID = 1
-
 export default function SpendManagement() {
+  const { user } = useAuth()
+  const organizationId = user?.organization_id || 1
   const queryClient = useQueryClient()
   const [editingCohort, setEditingCohort] = useState<number | null>(null)
   const [formData, setFormData] = useState({ committed: '', adjustment: '' })
 
   const { data: cohorts = [], isLoading } = useQuery({
-    queryKey: ['cohorts', ORGANIZATION_ID],
-    queryFn: () => cohortsApi.list(ORGANIZATION_ID).then((res) => res.data),
+    queryKey: ['cohorts', organizationId],
+    queryFn: () => cohortsApi.list(organizationId).then((res) => res.data),
+    enabled: !!user,
   })
 
   const updateMutation = useMutation({
     mutationFn: ({ cohortId, data }: { cohortId: number; data: any }) =>
-      cohortsApi.update(ORGANIZATION_ID, cohortId, data),
+      cohortsApi.update(organizationId, cohortId, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cohorts'] })
       setEditingCohort(null)

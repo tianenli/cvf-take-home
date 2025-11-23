@@ -1,15 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 import { cohortsApi } from '../lib/api'
+import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
 import { Link } from 'react-router-dom'
 
-const ORGANIZATION_ID = 1
-
 export default function CohortList() {
+  const { user } = useAuth()
+  const organizationId = user?.organization_id || 1
+
   const { data: cohorts = [], isLoading } = useQuery({
-    queryKey: ['cohorts', ORGANIZATION_ID],
-    queryFn: () => cohortsApi.list(ORGANIZATION_ID).then((res) => res.data),
+    queryKey: ['cohorts', organizationId],
+    queryFn: () => cohortsApi.list(organizationId).then((res) => res.data),
+    enabled: !!user,
   })
 
   if (isLoading) {
