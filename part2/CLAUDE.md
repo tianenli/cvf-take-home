@@ -1,3 +1,5 @@
+# Part 2 App Design Doc
+
 # Architecture
 
 The app will be a dockerized web application running Ruby on Rails as the web server, serving a client-side rendered React/Typescript frontend via vite.
@@ -64,7 +66,13 @@ status - AASM column with following states
 
     - new - has not been approved / funds have not been distributed
 
-    - active - approved / funds being distributed for current cohort
+     - submitted - user has submitted a finalized spend prediction for next month
+
+    - pending_approval - investment amount and percentage have been set by a fund administrator, pending org acceptance
+
+    - approved - approved / funds being distributed for current cohort
+
+    - pending_review - if actual spend is outside of the allowed range, flag this status
 
     - completed - month is done and adjustment to reflect final spend has been inputted
 
@@ -76,9 +84,13 @@ prediction_scenarios_override - can be null, in which case it defaults to fund_o
 
 thresholds_override - can be null, in which case it defaults to fund_organizations’s values
 
-committed - amount of spend planned
+planned_spend - amount of spend planned
 
-adjustment - amount of spend 
+actual_spend- amount of spend actual
+
+min_allowed_spend - min allowed actual spend - 
+
+max_allowed_spend - max allowed actual spend - 
 
 cash_cap
 

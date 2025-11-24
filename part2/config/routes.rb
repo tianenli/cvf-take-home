@@ -18,8 +18,9 @@ Rails.application.routes.draw do
       get 'me', to: 'sessions#current'
 
       resources :organizations, only: [:index, :show] do
-        resources :cohorts, only: [:index, :show, :update] do
+        resources :cohorts, only: [:index, :show, :create, :update] do
           member do
+            post :submit
             post :approve
             post :complete
             post :terminate

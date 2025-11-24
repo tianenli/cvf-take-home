@@ -21,7 +21,7 @@ class FundOrganization < ApplicationRecord
   before_validation :set_defaults, on: :create
 
   def total_invested
-    cohorts.where.not(status: 'new').sum(:committed)
+    cohorts.where.not(status: 'new').sum(:planned_spend)
   end
 
   def remaining_capacity
