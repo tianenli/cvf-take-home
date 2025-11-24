@@ -37,10 +37,7 @@ export default function CohortList() {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Committed
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Adjustment
+                  Planned Spend
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actual Spend
@@ -69,16 +66,13 @@ export default function CohortList() {
                     <StatusBadge status={cohort.status} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${cohort.committed.toLocaleString()}
+                    ${cohort.planned_spend.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {cohort.adjustment ? `$${cohort.adjustment.toLocaleString()}` : '-'}
+                    {cohort.actual_spend ? `$${cohort.actual_spend.toLocaleString()}` : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${cohort.actual_spend.toLocaleString()}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${cohort.cash_cap.toLocaleString()}
+                    {cohort.effective_cash_cap || cohort.cash_cap ? `$${(cohort.effective_cash_cap || cohort.cash_cap || 0).toLocaleString()}` : '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     ${cohort.total_returned.toLocaleString()}

@@ -42,19 +42,23 @@ export default function CohortDetail() {
         <Card title="Financial Overview">
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-gray-600">Committed Spend</p>
-              <p className="text-2xl font-bold text-gray-900">${cohort.committed.toLocaleString()}</p>
+              <p className="text-sm text-gray-600">Planned Spend</p>
+              <p className="text-2xl font-bold text-gray-900">${cohort.planned_spend.toLocaleString()}</p>
             </div>
-            {cohort.adjustment && (
+            {cohort.actual_spend && (
               <div>
-                <p className="text-sm text-gray-600">Adjustment</p>
-                <p className="text-2xl font-bold text-gray-900">${cohort.adjustment.toLocaleString()}</p>
+                <p className="text-sm text-gray-600">Actual Spend</p>
+                <p className="text-2xl font-bold text-gray-900">${cohort.actual_spend.toLocaleString()}</p>
               </div>
             )}
-            <div>
-              <p className="text-sm text-gray-600">Actual Spend</p>
-              <p className="text-2xl font-bold text-gray-900">${cohort.actual_spend.toLocaleString()}</p>
-            </div>
+            {cohort.adjusted_cash_cap && (
+              <div>
+                <p className="text-sm text-gray-600">Adjustment</p>
+                <p className="text-sm text-gray-600">
+                  Cash cap adjusted by {((cohort.adjusted_cash_cap / (cohort.cash_cap || 1)) * 100).toFixed(1)}%
+                </p>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -65,8 +69,10 @@ export default function CohortDetail() {
               <p className="text-2xl font-bold text-primary-600">${cohort.total_returned.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-600">Cash Cap</p>
-              <p className="text-2xl font-bold text-gray-900">${cohort.cash_cap.toLocaleString()}</p>
+              <p className="text-sm text-gray-600">Cash Cap{cohort.adjusted_cash_cap ? ' (Adjusted)' : ''}</p>
+              <p className="text-2xl font-bold text-gray-900">
+                ${(cohort.effective_cash_cap || cohort.cash_cap || 0).toLocaleString()}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Progress</p>
@@ -87,7 +93,9 @@ export default function CohortDetail() {
           <div className="space-y-4">
             <div>
               <p className="text-sm text-gray-600">Share Percentage</p>
-              <p className="text-2xl font-bold text-gray-900">{cohort.share_percentage}%</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {cohort.share_percentage !== null ? `${cohort.share_percentage}%` : 'Not set'}
+              </p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Status</p>
