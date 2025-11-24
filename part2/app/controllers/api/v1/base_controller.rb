@@ -35,13 +35,14 @@ module Api
           # Use Warden::JWTAuth to decode the token (uses same secret as encoding)
           payload = Warden::JWTAuth::TokenDecoder.new.call(token)
 
-          # Check if token is in denylist
-          jti = payload['jti']
-          return nil if JwtDenylist.exists?(jti: jti)
-
           # Find user from sub claim
           user_id = payload['sub']
-          @current_dashboard_user ||= DashboardUser.find(user_id)
+          user = DashboardUser.find(user_id)
+
+          # JtiMatcher strategy: verify token's jti matches user's current jti
+          return nil unless user.jti == payload['jti']
+
+          @current_dashboard_user ||= user
         rescue Warden::JWTAuth::Errors::RevokedToken, JWT::DecodeError, ActiveRecord::RecordNotFound
           nil
         end

@@ -1,9 +1,14 @@
 class DashboardUser < ApplicationRecord
+  include Devise::JWT::RevocationStrategies::JTIMatcher
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable,
          :recoverable, :rememberable, :validatable,
-         :jwt_authenticatable, jwt_revocation_strategy: JwtDenylist
+         :jwt_authenticatable, jwt_revocation_strategy: self
+
+  # Callbacks
+  before_create :set_jti
 
   # Associations
   belongs_to :organization
@@ -25,5 +30,11 @@ class DashboardUser < ApplicationRecord
   # Check if user has access to a specific cohort
   def has_access_to_cohort?(cohort_id)
     cohorts.exists?(id: cohort_id)
+  end
+
+  private
+
+  def set_jti
+    self.jti = SecureRandom.uuid
   end
 end

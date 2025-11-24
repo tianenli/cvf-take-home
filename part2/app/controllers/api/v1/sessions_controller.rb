@@ -26,28 +26,10 @@ module Api
       end
 
       def destroy
-        # Revoke the JWT token
+        # Revoke JWT tokens by updating user's jti (handled by JtiMatcher strategy)
         if current_dashboard_user
-          # Add token to denylist
-          token = request.headers['Authorization']&.gsub(/^Bearer /, '')
-          if token
-            begin
-              jwt_payload = JWT.decode(
-                token,
-                ENV['DEVISE_JWT_SECRET_KEY'] || Rails.application.credentials.fetch(:devise_jwt_secret_key, SecureRandom.hex(64)),
-                true,
-                { algorithm: 'HS256' }
-              ).first
-
-              JwtDenylist.create!(
-                jti: jwt_payload['jti'],
-                exp: Time.at(jwt_payload['exp'])
-              )
-            rescue JWT::DecodeError
-              # Token already invalid
-            end
-          end
-
+          # Trigger revocation by updating the jti field
+          current_dashboard_user.update!(jti: SecureRandom.uuid)
           render json: { message: 'Logged out successfully' }, status: :ok
         else
           render json: { error: 'Not authenticated' }, status: :unauthorized

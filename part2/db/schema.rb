@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_24_030906) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_24_034746) do
   create_table "admin_users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -83,7 +83,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_24_030906) do
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "jti", null: false
     t.index ["email"], name: "index_dashboard_users_on_email", unique: true
+    t.index ["jti"], name: "index_dashboard_users_on_jti", unique: true
     t.index ["organization_id"], name: "index_dashboard_users_on_organization_id"
     t.index ["reset_password_token"], name: "index_dashboard_users_on_reset_password_token", unique: true
   end
@@ -113,14 +115,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_24_030906) do
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_funds_on_name"
     t.index ["start_date"], name: "index_funds_on_start_date"
-  end
-
-  create_table "jwt_denylists", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
-    t.string "jti"
-    t.datetime "exp"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["jti"], name: "index_jwt_denylists_on_jti"
   end
 
   create_table "organizations", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
