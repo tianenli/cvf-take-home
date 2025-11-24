@@ -3,6 +3,7 @@ require 'sidekiq-scheduler/web'
 
 Rails.application.routes.draw do
   devise_for :admin_users, ActiveAdmin::Devise.config
+  devise_for :dashboard_users, skip: :all
   ActiveAdmin.routes(self)
 
   # Mount Sidekiq web UI

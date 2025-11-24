@@ -94,7 +94,7 @@ export default function Login() {
             <p className="text-sm text-gray-600">
               Demo credentials: <br />
               <code className="bg-gray-100 px-2 py-1 rounded text-xs">
-                user@company.com / password
+                test@example.com / password123
               </code>
             </p>
           </div>

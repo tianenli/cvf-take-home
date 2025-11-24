@@ -19,6 +19,7 @@ gem 'sidekiq-scheduler'
 # Admin Interface
 gem 'activeadmin'
 gem 'devise'
+gem 'devise-jwt'
 
 # State Machine
 gem 'aasm'

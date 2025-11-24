@@ -1,42 +1,54 @@
 module Api
   module V1
     class BaseController < ActionController::API
+      class UnauthorizedError < StandardError; end
+
+      include ActionController::MimeResponds
+
+      respond_to :json
       before_action :authenticate_dashboard_user!
 
       rescue_from ActiveRecord::RecordNotFound, with: :not_found
       rescue_from ActiveRecord::RecordInvalid, with: :unprocessable_entity
       rescue_from UnauthorizedError, with: :unauthorized
 
-      attr_reader :current_dashboard_user
-
-      class UnauthorizedError < StandardError; end
-
       private
 
       def authenticate_dashboard_user!
-        token = request.headers['Authorization']&.split(' ')&.last
-
-        if token.blank?
-          render json: { error: 'No token provided' }, status: :unauthorized
-          return
+        # Use Warden/Devise for JWT authentication
+        unless current_dashboard_user
+          render json: { error: 'Unauthorized' }, status: :unauthorized
         end
+      end
+
+      def current_dashboard_user
+        # Use Devise's current_user method with custom scope
+        @current_dashboard_user ||= current_dashboard_user_from_jwt
+      end
+
+      def current_dashboard_user_from_jwt
+        # Extract JWT from Authorization header
+        token = request.headers['Authorization']&.gsub(/^Bearer /, '')
+        return nil unless token
 
         begin
-          payload = JSON.parse(Base64.strict_decode64(token))
+          # Use Warden::JWTAuth to decode the token (uses same secret as encoding)
+          payload = Warden::JWTAuth::TokenDecoder.new.call(token)
 
-          if Time.at(payload['exp']) < Time.now
-            render json: { error: 'Token expired' }, status: :unauthorized
-            return
-          end
+          # Check if token is in denylist
+          jti = payload['jti']
+          return nil if JwtDenylist.exists?(jti: jti)
 
-          @current_dashboard_user = DashboardUser.find(payload['user_id'])
-        rescue => e
-          render json: { error: 'Invalid token' }, status: :unauthorized
+          # Find user from sub claim
+          user_id = payload['sub']
+          @current_dashboard_user ||= DashboardUser.find(user_id)
+        rescue Warden::JWTAuth::Errors::RevokedToken, JWT::DecodeError, ActiveRecord::RecordNotFound
+          nil
         end
       end
 
       def current_organization
-        current_dashboard_user.organization
+        current_dashboard_user&.organization
       end
 
       def authorize_organization!(organization_id)

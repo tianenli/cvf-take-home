@@ -7,8 +7,8 @@ module Api
         user = DashboardUser.find_by(email: params[:email])
 
         if user&.valid_password?(params[:password])
-          # Generate a simple token (in production, use JWT or similar)
-          token = generate_token(user)
+          # Generate JWT token using Warden::JWTAuth
+          token = Warden::JWTAuth::UserEncoder.new.call(user, :dashboard_user, nil).first
 
           render json: {
             token: token,
@@ -26,8 +26,32 @@ module Api
       end
 
       def destroy
-        # In a real app, you'd invalidate the token here
-        render json: { message: 'Logged out successfully' }, status: :ok
+        # Revoke the JWT token
+        if current_dashboard_user
+          # Add token to denylist
+          token = request.headers['Authorization']&.gsub(/^Bearer /, '')
+          if token
+            begin
+              jwt_payload = JWT.decode(
+                token,
+                ENV['DEVISE_JWT_SECRET_KEY'] || Rails.application.credentials.fetch(:devise_jwt_secret_key, SecureRandom.hex(64)),
+                true,
+                { algorithm: 'HS256' }
+              ).first
+
+              JwtDenylist.create!(
+                jti: jwt_payload['jti'],
+                exp: Time.at(jwt_payload['exp'])
+              )
+            rescue JWT::DecodeError
+              # Token already invalid
+            end
+          end
+
+          render json: { message: 'Logged out successfully' }, status: :ok
+        else
+          render json: { error: 'Not authenticated' }, status: :unauthorized
+        end
       end
 
       def current
@@ -40,18 +64,6 @@ module Api
             organization_name: current_dashboard_user.organization.name
           }
         }, status: :ok
-      end
-
-      private
-
-      def generate_token(user)
-        # Simple token for demo - in production use JWT
-        payload = {
-          user_id: user.id,
-          organization_id: user.organization_id,
-          exp: 24.hours.from_now.to_i
-        }
-        Base64.strict_encode64(payload.to_json)
       end
     end
   end
