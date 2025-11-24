@@ -15,6 +15,7 @@ class FundOrganization < ApplicationRecord
   validates :max_invest_per_cohort, numericality: { greater_than: 0 }, allow_nil: true
   validates :max_total_invest, numericality: { greater_than: 0 }, allow_nil: true
   validate :first_cohort_before_last_cohort
+  validate :no_overlapping_cohort_date_intervals
 
   # Callbacks
   before_validation :set_defaults, on: :create
@@ -62,6 +63,31 @@ class FundOrganization < ApplicationRecord
 
     if last_cohort_date < first_cohort_date
       errors.add(:last_cohort_date, "must be after first cohort date")
+    end
+  end
+
+  def no_overlapping_cohort_date_intervals
+    return if first_cohort_date.blank? || last_cohort_date.blank?
+
+    # Find other fund_organizations for the same organization (excluding current record)
+    overlapping = FundOrganization
+      .where(organization_id: organization_id)
+      .where.not(id: id)
+      .where.not(first_cohort_date: nil)
+      .where.not(last_cohort_date: nil)
+      .where(
+        '(first_cohort_date <= ? AND last_cohort_date >= ?) OR (first_cohort_date <= ? AND last_cohort_date >= ?)',
+        last_cohort_date, first_cohort_date, first_cohort_date, last_cohort_date
+      )
+
+    if overlapping.exists?
+      overlapping_fund = overlapping.first
+      errors.add(:base,
+        "Cohort date interval [#{first_cohort_date} - #{last_cohort_date}] overlaps with " \
+        "existing fund '#{overlapping_fund.fund.name}' interval " \
+        "[#{overlapping_fund.first_cohort_date} - #{overlapping_fund.last_cohort_date}]. " \
+        "Each cohort must belong to exactly one fund based on its start date."
+      )
     end
   end
 end
