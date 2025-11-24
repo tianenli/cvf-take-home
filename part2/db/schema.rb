@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_24_060940) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_24_091017) do
   create_table "admin_users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -44,13 +44,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_24_060940) do
   create_table "cohorts", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "fund_organization_id", null: false
     t.date "cohort_start_date", null: false
-    t.decimal "share_percentage", precision: 5, scale: 2, null: false
+    t.decimal "share_percentage", precision: 5, scale: 2
     t.string "status", default: "new", null: false
     t.json "prediction_scenarios_override"
     t.json "thresholds_override"
     t.decimal "planned_spend", precision: 15, scale: 2, default: "0.0"
     t.decimal "actual_spend", precision: 15, scale: 2
-    t.decimal "cash_cap", precision: 15, scale: 2, null: false
+    t.decimal "cash_cap", precision: 15, scale: 2
     t.decimal "total_returned", precision: 15, scale: 2, default: "0.0"
     t.datetime "approved_at"
     t.datetime "completed_at"
@@ -60,6 +60,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_24_060940) do
     t.datetime "updated_at", null: false
     t.decimal "min_allowed_spend", precision: 15, scale: 2, default: "0.0", null: false
     t.decimal "max_allowed_spend", precision: 15, scale: 2
+    t.decimal "adjusted_cash_cap", precision: 15, scale: 2
     t.index ["cohort_start_date"], name: "index_cohorts_on_cohort_start_date"
     t.index ["fund_organization_id", "cohort_start_date"], name: "index_cohorts_on_fund_org_and_start_date", unique: true
     t.index ["fund_organization_id"], name: "index_cohorts_on_fund_organization_id"

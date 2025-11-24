@@ -25,6 +25,7 @@ class Cohort < ApplicationRecord
   validates :total_returned, numericality: { greater_than_or_equal_to: 0 }
   validates :min_allowed_spend, numericality: { greater_than_or_equal_to: 0 }
   validates :max_allowed_spend, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :adjusted_cash_cap, numericality: { greater_than: 0 }, allow_nil: true
 
   # Callbacks
   before_validation :set_defaults, on: :create
@@ -46,7 +47,7 @@ class Cohort < ApplicationRecord
     state :terminated
 
     event :submit do
-      transitions from: :new, to: :submitted, after: :generate_investment_proposal
+      transitions from: :new, to: :pending_approval, after: :generate_investment_proposal
     end
 
     event :approve do
@@ -83,7 +84,8 @@ class Cohort < ApplicationRecord
   end
 
   def is_settled?
-    total_returned >= cash_cap
+    return false if effective_cash_cap.nil?
+    total_returned >= effective_cash_cap
   end
 
   def actual_spend_in_range?
@@ -102,12 +104,25 @@ class Cohort < ApplicationRecord
 
   def set_actual_spend!(amount)
     self.actual_spend = amount
+    calculate_adjusted_cash_cap!
 
     if actual_spend_in_range?
       complete!
     else
       flag_for_review!
     end
+  end
+
+  def calculate_adjusted_cash_cap!
+    return if actual_spend.blank? || planned_spend.blank? || planned_spend.zero? || cash_cap.blank?
+
+    # Only adjust if actual_spend differs from planned_spend
+    ratio = actual_spend / planned_spend
+    self.adjusted_cash_cap = ratio == 1.0 ? nil : cash_cap * ratio
+  end
+
+  def effective_cash_cap
+    adjusted_cash_cap || cash_cap
   end
 
   private
@@ -127,10 +142,6 @@ class Cohort < ApplicationRecord
     if fund_organization.max_invest_per_cohort
       self.max_allowed_spend = fund_organization.max_invest_per_cohort / share_percentage * 100.0
     end
-
-    # Transition to pending_approval
-    self.status = 'pending_approval'
-    save!
   end
 
   def set_approved_at
