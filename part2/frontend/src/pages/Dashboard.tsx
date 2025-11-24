@@ -116,7 +116,7 @@ export default function Dashboard() {
                     ${cohort.total_returned.toLocaleString()}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {cohort.progress_percentage.toFixed(1)}%
+                    {Number(cohort.progress_percentage || 0).toFixed(1)}%
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <Link

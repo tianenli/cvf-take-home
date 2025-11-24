@@ -80,10 +80,10 @@ export default function CohortDetail() {
                 <div className="w-full bg-gray-200 rounded-full h-2.5 mr-2">
                   <div
                     className="bg-primary-600 h-2.5 rounded-full"
-                    style={{ width: `${Math.min(cohort.progress_percentage, 100)}%` }}
+                    style={{ width: `${Math.min(Number(cohort.progress_percentage || 0), 100)}%` }}
                   ></div>
                 </div>
-                <span className="text-sm font-medium">{cohort.progress_percentage.toFixed(1)}%</span>
+                <span className="text-sm font-medium">{Number(cohort.progress_percentage || 0).toFixed(1)}%</span>
               </div>
             </div>
           </div>

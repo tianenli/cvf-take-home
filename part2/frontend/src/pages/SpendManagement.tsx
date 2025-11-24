@@ -295,7 +295,7 @@ export default function SpendManagement() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {cohort.progress_percentage}%
+                    {Number(cohort.progress_percentage || 0).toFixed(1)}%
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     {getActionButtons(cohort)}
