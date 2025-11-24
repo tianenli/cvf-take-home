@@ -25,22 +25,55 @@ api.interceptors.response.use(
     // If response has JSON API format, transform it
     if (response.data && response.data.data) {
       const data = response.data.data
+      const included = response.data.included || []
+
+      // Build a map of included resources by type and id
+      const includedMap: Record<string, Record<string, any>> = {}
+      included.forEach((item: any) => {
+        if (!includedMap[item.type]) {
+          includedMap[item.type] = {}
+        }
+        includedMap[item.type][item.id] = {
+          id: item.id,
+          ...item.attributes,
+        }
+      })
+
+      // Helper to resolve relationships
+      const resolveRelationships = (item: any) => {
+        const resolved: any = {
+          id: item.id,
+          ...item.attributes,
+        }
+
+        // Handle relationships
+        if (item.relationships) {
+          Object.keys(item.relationships).forEach((key) => {
+            const rel = item.relationships[key]
+            if (rel.data) {
+              if (Array.isArray(rel.data)) {
+                // Has many relationship
+                resolved[key] = rel.data.map((ref: any) =>
+                  includedMap[ref.type]?.[ref.id] || { id: ref.id }
+                )
+              } else if (rel.data.type && rel.data.id) {
+                // Belongs to relationship
+                resolved[key] = includedMap[rel.data.type]?.[rel.data.id] || { id: rel.data.id }
+              }
+            }
+          })
+        }
+
+        return resolved
+      }
 
       // Handle arrays (list responses)
       if (Array.isArray(data)) {
-        response.data = data.map((item: any) => ({
-          id: item.id,
-          ...item.attributes,
-          ...(item.relationships || {}),
-        }))
+        response.data = data.map(resolveRelationships)
       }
       // Handle single objects (show responses)
       else if (data.id && data.attributes) {
-        response.data = {
-          id: data.id,
-          ...data.attributes,
-          ...(data.relationships || {}),
-        }
+        response.data = resolveRelationships(data)
       }
     }
 

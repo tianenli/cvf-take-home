@@ -140,7 +140,7 @@ export default function CohortDetail() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {cohort.cohort_payments.map((payment) => (
+              {(cohort.cohort_payments || []).map((payment) => (
                 <tr key={payment.id} className={payment.threshold_hit ? 'bg-red-50' : ''}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     M{payment.months_after}
