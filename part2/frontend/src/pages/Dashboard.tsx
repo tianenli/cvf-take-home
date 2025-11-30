@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
 import { Link } from 'react-router-dom'
+import { formatCurrency, formatMonthYear } from '../utils/formatters'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -60,7 +61,7 @@ export default function Dashboard() {
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-600">Total Invested</p>
             <p className="text-3xl font-bold text-gray-900">
-              ${stats.totalInvested.toLocaleString()}
+              {formatCurrency(stats.totalInvested)}
             </p>
           </div>
         </Card>
@@ -69,7 +70,7 @@ export default function Dashboard() {
           <div className="space-y-2">
             <p className="text-sm font-medium text-gray-600">Total Returned</p>
             <p className="text-3xl font-bold text-primary-600">
-              ${stats.totalReturned.toLocaleString()}
+              {formatCurrency(stats.totalReturned)}
             </p>
           </div>
         </Card>
@@ -104,16 +105,16 @@ export default function Dashboard() {
               {recentCohorts.map((cohort) => (
                 <tr key={cohort.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {new Date(cohort.cohort_start_date).toLocaleDateString()}
+                    {formatMonthYear(cohort.cohort_start_date)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <StatusBadge status={cohort.status} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${cohort.planned_spend.toLocaleString()}
+                    {formatCurrency(cohort.planned_spend)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${cohort.total_returned.toLocaleString()}
+                    {formatCurrency(cohort.total_returned)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {Number(cohort.progress_percentage || 0).toFixed(1)}%

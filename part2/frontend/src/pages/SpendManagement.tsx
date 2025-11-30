@@ -4,6 +4,7 @@ import { cohortsApi } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
+import { formatCurrency, formatMonthYear } from '../utils/formatters'
 
 export default function SpendManagement() {
   const { user } = useAuth()
@@ -191,11 +192,6 @@ export default function SpendManagement() {
     }
   }
 
-  const formatCurrency = (value: number | null | undefined) => {
-    if (value === null || value === undefined) return '-'
-    return `$${value.toLocaleString()}`
-  }
-
   if (isLoading) {
     return <div>Loading...</div>
   }
@@ -252,7 +248,7 @@ export default function SpendManagement() {
               {cohorts.map((cohort) => (
                 <tr key={cohort.id}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {new Date(cohort.cohort_start_date).toLocaleDateString()}
+                    {formatMonthYear(cohort.cohort_start_date)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <StatusBadge status={cohort.status} />
@@ -315,12 +311,12 @@ export default function SpendManagement() {
             <form onSubmit={handleCreateSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Cohort Start Date
+                  Cohort Month
                 </label>
                 <input
-                  type="date"
-                  value={createFormData.cohort_start_date}
-                  onChange={(e) => setCreateFormData({ ...createFormData, cohort_start_date: e.target.value })}
+                  type="month"
+                  value={createFormData.cohort_start_date.substring(0, 7)}
+                  onChange={(e) => setCreateFormData({ ...createFormData, cohort_start_date: e.target.value + '-01' })}
                   className="w-full border rounded px-3 py-2"
                   required
                 />
@@ -372,7 +368,7 @@ export default function SpendManagement() {
               return cohort ? (
                 <div className="space-y-3 mb-6">
                   <p className="text-gray-700">
-                    Review the investment proposal for cohort starting <strong>{new Date(cohort.cohort_start_date).toLocaleDateString()}</strong>:
+                    Review the investment proposal for cohort starting <strong>{formatMonthYear(cohort.cohort_start_date)}</strong>:
                   </p>
                   <div className="bg-gray-50 p-4 rounded space-y-2 text-sm">
                     <div className="flex justify-between">

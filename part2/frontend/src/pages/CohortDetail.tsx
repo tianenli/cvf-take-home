@@ -4,6 +4,7 @@ import { cohortsApi } from '../lib/api'
 import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
+import { formatCurrency, formatMonthYear } from '../utils/formatters'
 
 export default function CohortDetail() {
   const { id } = useParams<{ id: string }>()
@@ -29,7 +30,7 @@ export default function CohortDetail() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            Cohort: {new Date(cohort.cohort_start_date).toLocaleDateString()}
+            Cohort: {formatMonthYear(cohort.cohort_start_date)}
           </h1>
           <p className="mt-2 text-gray-600">
             {cohort.organization_name} • {cohort.fund_name}
@@ -43,12 +44,12 @@ export default function CohortDetail() {
           <div className="space-y-4">
             <div>
               <p className="text-sm text-gray-600">Planned Spend</p>
-              <p className="text-2xl font-bold text-gray-900">${cohort.planned_spend.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(cohort.planned_spend)}</p>
             </div>
             {cohort.actual_spend && (
               <div>
                 <p className="text-sm text-gray-600">Actual Spend</p>
-                <p className="text-2xl font-bold text-gray-900">${cohort.actual_spend.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-gray-900">{formatCurrency(cohort.actual_spend)}</p>
               </div>
             )}
             {cohort.adjusted_cash_cap && (
@@ -66,12 +67,12 @@ export default function CohortDetail() {
           <div className="space-y-4">
             <div>
               <p className="text-sm text-gray-600">Total Returned</p>
-              <p className="text-2xl font-bold text-primary-600">${cohort.total_returned.toLocaleString()}</p>
+              <p className="text-2xl font-bold text-primary-600">{formatCurrency(cohort.total_returned)}</p>
             </div>
             <div>
               <p className="text-sm text-gray-600">Cash Cap{cohort.adjusted_cash_cap ? ' (Adjusted)' : ''}</p>
               <p className="text-2xl font-bold text-gray-900">
-                ${(cohort.effective_cash_cap || cohort.cash_cap || 0).toLocaleString()}
+                {formatCurrency(cohort.effective_cash_cap || cohort.cash_cap)}
               </p>
             </div>
             <div>
@@ -149,7 +150,7 @@ export default function CohortDetail() {
                     <StatusBadge status={payment.status} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${payment.total_revenue.toLocaleString()}
+                    {formatCurrency(payment.total_revenue)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {payment.payment_percent_of_spend.toFixed(2)}%
@@ -165,13 +166,13 @@ export default function CohortDetail() {
                     {payment.share_percentage}%
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${payment.total_owed.toLocaleString()}
+                    {formatCurrency(payment.total_owed)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${payment.total_paid.toLocaleString()}
+                    {formatCurrency(payment.total_paid)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${payment.outstanding_amount.toLocaleString()}
+                    {formatCurrency(payment.outstanding_amount)}
                   </td>
                 </tr>
               ))}

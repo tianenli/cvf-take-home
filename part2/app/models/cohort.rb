@@ -18,6 +18,7 @@ class Cohort < ApplicationRecord
   # Validations
   validates :cohort_start_date, presence: true
   validates :cohort_start_date, uniqueness: { scope: :fund_organization_id }
+  validate :cohort_start_date_must_be_beginning_of_month
   validates :share_percentage, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }, allow_nil: true
   validates :cash_cap, numericality: { greater_than: 0 }, allow_nil: true
   validates :planned_spend, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
@@ -162,5 +163,13 @@ class Cohort < ApplicationRecord
 
   def recalculate_cohort_payments
     RecalculateCohortPaymentsJob.perform_async(id)
+  end
+
+  def cohort_start_date_must_be_beginning_of_month
+    return if cohort_start_date.blank?
+
+    unless cohort_start_date.day == 1
+      errors.add(:cohort_start_date, "must be the first day of the month")
+    end
   end
 end

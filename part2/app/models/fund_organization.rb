@@ -16,6 +16,7 @@ class FundOrganization < ApplicationRecord
   validates :max_total_invest, numericality: { greater_than: 0 }, allow_nil: true
   validate :first_cohort_before_last_cohort
   validate :no_overlapping_cohort_date_intervals
+  validate :cohort_dates_must_be_beginning_of_month
 
   # Callbacks
   before_validation :set_defaults, on: :create
@@ -88,6 +89,16 @@ class FundOrganization < ApplicationRecord
         "[#{overlapping_fund.first_cohort_date} - #{overlapping_fund.last_cohort_date}]. " \
         "Each cohort must belong to exactly one fund based on its start date."
       )
+    end
+  end
+
+  def cohort_dates_must_be_beginning_of_month
+    if first_cohort_date.present? && first_cohort_date.day != 1
+      errors.add(:first_cohort_date, "must be the first day of the month")
+    end
+
+    if last_cohort_date.present? && last_cohort_date.day != 1
+      errors.add(:last_cohort_date, "must be the first day of the month")
     end
   end
 end

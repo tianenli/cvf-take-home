@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
 import { Link } from 'react-router-dom'
+import { formatCurrency, formatMonthYear } from '../utils/formatters'
 
 export default function CohortList() {
   const { user } = useAuth()
@@ -60,22 +61,22 @@ export default function CohortList() {
               {cohorts.map((cohort) => (
                 <tr key={cohort.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {new Date(cohort.cohort_start_date).toLocaleDateString()}
+                    {formatMonthYear(cohort.cohort_start_date)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <StatusBadge status={cohort.status} />
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${cohort.planned_spend.toLocaleString()}
+                    {formatCurrency(cohort.planned_spend)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {cohort.actual_spend ? `$${cohort.actual_spend.toLocaleString()}` : '-'}
+                    {formatCurrency(cohort.actual_spend)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {cohort.effective_cash_cap || cohort.cash_cap ? `$${(cohort.effective_cash_cap || cohort.cash_cap || 0).toLocaleString()}` : '-'}
+                    {formatCurrency(cohort.effective_cash_cap || cohort.cash_cap)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${cohort.total_returned.toLocaleString()}
+                    {formatCurrency(cohort.total_returned)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
