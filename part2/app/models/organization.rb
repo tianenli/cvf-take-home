@@ -5,6 +5,7 @@ class Organization < ApplicationRecord
   has_many :txns, dependent: :restrict_with_error
   has_many :customers, through: :cohorts
   has_many :dashboard_users, dependent: :destroy
+  has_many :transaction_uploads, dependent: :destroy
 
   # Validations
   validates :name, presence: true, uniqueness: true

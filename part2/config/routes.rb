@@ -28,6 +28,7 @@ Rails.application.routes.draw do
           resources :cohort_payments, only: [:index, :show]
         end
         resources :txns, only: [:index, :create]
+        resources :transaction_uploads, only: [:index, :show, :create]
       end
 
       resources :funds, only: [:index, :show]

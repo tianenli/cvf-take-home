@@ -28,6 +28,25 @@ services:
       timeout: 5s
       retries: 5
 
+  localstack:
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3
+      - DEBUG=1
+      - DATA_DIR=/tmp/localstack/data
+      - DOCKER_HOST=unix:///var/run/docker.sock
+    volumes:
+      - localstack_data:/tmp/localstack
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD", "awslocal", "s3", "ls"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   web:
     build:
       context: .
@@ -51,6 +70,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      localstack:
+        condition: service_healthy
     environment:
       DATABASE_HOST: db
       DATABASE_USERNAME: root
@@ -58,6 +79,11 @@ services:
       DATABASE_NAME: cvf_development
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: development
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: us-east-1
+      S3_BUCKET: cvf-transactions
+      S3_ENDPOINT: http://localstack:4566
     stdin_open: true
     tty: true
 
@@ -79,6 +105,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      localstack:
+        condition: service_healthy
     environment:
       DATABASE_HOST: db
       DATABASE_USERNAME: root
@@ -86,6 +114,11 @@ services:
       DATABASE_NAME: cvf_development
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: development
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: us-east-1
+      S3_BUCKET: cvf-transactions
+      S3_ENDPOINT: http://localstack:4566
 
   scheduler:
     build:
@@ -105,6 +138,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      localstack:
+        condition: service_healthy
     environment:
       DATABASE_HOST: db
       DATABASE_USERNAME: root
@@ -112,6 +147,11 @@ services:
       DATABASE_NAME: cvf_development
       REDIS_URL: redis://redis:6379/0
       RAILS_ENV: development
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: us-east-1
+      S3_BUCKET: cvf-transactions
+      S3_ENDPOINT: http://localstack:4566
 
   frontend:
     build:
@@ -131,4 +171,5 @@ services:
 volumes:
   mysql_data:
   redis_data:
+  localstack_data:
   bundle_cache:
