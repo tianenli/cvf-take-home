@@ -17,11 +17,13 @@ class ProcessTransactionUploadJob < ApplicationJob
       processed_count = 0
       failed_count = 0
       error_details = []
+      affected_cohort_ids = Set.new
 
       csv_data.each_with_index do |row, index|
         row_number = index + 2 # Account for header row and 1-based indexing
         begin
-          process_transaction_row(transaction_upload.organization, row, row_number)
+          cohort_id = process_transaction_row(transaction_upload.organization, row, row_number)
+          affected_cohort_ids.add(cohort_id) if cohort_id
           processed_count += 1
         rescue => e
           failed_count += 1
@@ -41,6 +43,11 @@ class ProcessTransactionUploadJob < ApplicationJob
         failed_rows: failed_count,
         error_details: error_details
       )
+
+      # Enqueue cohort payment recalculation jobs for affected cohorts
+      affected_cohort_ids.each do |cohort_id|
+        RecalculateCohortPaymentsJob.perform_later(cohort_id)
+      end
 
       # If any rows failed, mark as errored
       if failed_count > 0
@@ -102,5 +109,8 @@ class ProcessTransactionUploadJob < ApplicationJob
     txn.payment_date = payment_date
     txn.amount = amount
     txn.save!
+
+    # Return cohort ID so it can be added to affected cohorts
+    cohort.id
   end
 end
