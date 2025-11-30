@@ -1,5 +1,5 @@
 interface StatusBadgeProps {
-  status: string
+  status: string | null | undefined
 }
 
 export default function StatusBadge({ status }: StatusBadgeProps) {
@@ -32,10 +32,10 @@ export default function StatusBadge({ status }: StatusBadgeProps) {
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-        colors[status] || 'bg-gray-100 text-gray-800'
+        status ? (colors[status] || 'bg-gray-100 text-gray-800') : 'bg-gray-100 text-gray-800'
       }`}
     >
-      {labels[status] || status.toUpperCase()}
+      {status ? (labels[status] || status.toUpperCase()) : 'UNKNOWN'}
     </span>
   )
 }
