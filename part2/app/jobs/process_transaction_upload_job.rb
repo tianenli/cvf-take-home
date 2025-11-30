@@ -46,7 +46,7 @@ class ProcessTransactionUploadJob < ApplicationJob
 
       # Enqueue cohort payment recalculation jobs for affected cohorts
       affected_cohort_ids.each do |cohort_id|
-        RecalculateCohortPaymentsJob.perform_later(cohort_id)
+        RecalculateCohortPaymentsJob.perform_async(cohort_id)
       end
 
       # If any rows failed, mark as errored
