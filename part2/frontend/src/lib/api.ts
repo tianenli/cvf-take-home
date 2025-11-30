@@ -170,6 +170,22 @@ export interface Txn {
   updated_at: string
 }
 
+export interface TransactionUpload {
+  id: number
+  organization_id: number
+  status: 'submitted' | 'processing' | 'processed' | 'errored'
+  error_message: string | null
+  total_rows: number | null
+  processed_rows: number | null
+  failed_rows: number | null
+  processing_started_at: string | null
+  processing_completed_at: string | null
+  created_at: string
+  updated_at: string
+  csv_file_url: string | null
+  csv_file_name: string | null
+}
+
 // API Functions
 export const organizationsApi = {
   list: () => api.get<Organization[]>('/organizations'),
@@ -205,4 +221,24 @@ export const txnsApi = {
     api.get<Txn[]>(`/organizations/${organizationId}/txns`),
   create: (organizationId: number, data: Partial<Txn>) =>
     api.post<Txn>(`/organizations/${organizationId}/txns`, { txn: data }),
+}
+
+export const transactionUploadsApi = {
+  list: (organizationId: number) =>
+    api.get<TransactionUpload[]>(`/organizations/${organizationId}/transaction_uploads`),
+  get: (organizationId: number, id: number) =>
+    api.get<TransactionUpload>(`/organizations/${organizationId}/transaction_uploads/${id}`),
+  create: (organizationId: number, file: File) => {
+    const formData = new FormData()
+    formData.append('csv_file', file)
+    return api.post<TransactionUpload>(
+      `/organizations/${organizationId}/transaction_uploads`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    )
+  },
 }
