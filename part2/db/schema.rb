@@ -10,7 +10,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_24_091017) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_29_000002) do
+  create_table "active_storage_attachments", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
   create_table "admin_users", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.string "email", default: "", null: false
     t.string "encrypted_password", default: "", null: false
@@ -127,6 +155,22 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_24_091017) do
     t.index ["name"], name: "index_organizations_on_name"
   end
 
+  create_table "transaction_uploads", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
+    t.bigint "organization_id", null: false
+    t.string "status", default: "submitted", null: false
+    t.text "error_message"
+    t.integer "total_rows"
+    t.integer "processed_rows"
+    t.integer "failed_rows"
+    t.datetime "processing_started_at"
+    t.datetime "processing_completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_transaction_uploads_on_created_at"
+    t.index ["organization_id"], name: "index_transaction_uploads_on_organization_id"
+    t.index ["status"], name: "index_transaction_uploads_on_status"
+  end
+
   create_table "txns", charset: "utf8mb4", collation: "utf8mb4_unicode_ci", force: :cascade do |t|
     t.bigint "organization_id", null: false
     t.bigint "customer_id", null: false
@@ -141,12 +185,15 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_24_091017) do
     t.index ["payment_date"], name: "index_txns_on_payment_date"
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "cohort_payments", "cohorts"
   add_foreign_key "cohorts", "fund_organizations"
   add_foreign_key "customers", "cohorts"
   add_foreign_key "dashboard_users", "organizations"
   add_foreign_key "fund_organizations", "funds"
   add_foreign_key "fund_organizations", "organizations"
+  add_foreign_key "transaction_uploads", "organizations"
   add_foreign_key "txns", "customers"
   add_foreign_key "txns", "organizations"
 end
