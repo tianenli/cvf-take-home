@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 import Card from '../components/Card'
 import StatusBadge from '../components/StatusBadge'
 import { formatCurrency, formatMonthYear } from '../utils/formatters'
+import { monthInputToDateString, dateStringToMonthInput } from '../utils/dateUtils'
 
 export default function SpendManagement() {
   const { user } = useAuth()
@@ -315,8 +316,8 @@ export default function SpendManagement() {
                 </label>
                 <input
                   type="month"
-                  value={createFormData.cohort_start_date.substring(0, 7)}
-                  onChange={(e) => setCreateFormData({ ...createFormData, cohort_start_date: e.target.value + '-01' })}
+                  value={createFormData.cohort_start_date ? dateStringToMonthInput(createFormData.cohort_start_date) : ''}
+                  onChange={(e) => setCreateFormData({ ...createFormData, cohort_start_date: monthInputToDateString(e.target.value) })}
                   className="w-full border rounded px-3 py-2"
                   required
                 />
