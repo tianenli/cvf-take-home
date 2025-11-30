@@ -11,7 +11,7 @@ class TransactionUpload < ApplicationRecord
   validate :csv_file_must_be_csv
 
   # Callbacks
-  after_create :enqueue_processing_job
+  after_create_commit :enqueue_processing_job
 
   # AASM State Machine
   aasm column: :status do
