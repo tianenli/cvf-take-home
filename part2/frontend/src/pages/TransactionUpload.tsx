@@ -293,10 +293,51 @@ export default function TransactionUpload() {
                             </div>
                             {upload.error_message && (
                               <div className="mt-3">
-                                <span className="font-medium text-red-700">Error Details:</span>
-                                <pre className="mt-2 p-3 bg-red-50 border border-red-200 rounded text-xs text-red-800 overflow-x-auto">
-                                  {upload.error_message}
-                                </pre>
+                                <span className="font-medium text-red-700">Error Summary:</span>
+                                <p className="mt-1 text-sm text-red-800">{upload.error_message}</p>
+                              </div>
+                            )}
+                            {upload.error_details && upload.error_details.length > 0 && (
+                              <div className="mt-3">
+                                <span className="font-medium text-red-700">Failed Rows:</span>
+                                <div className="mt-2 max-h-60 overflow-y-auto">
+                                  <table className="min-w-full text-xs border border-red-200">
+                                    <thead className="bg-red-50 sticky top-0">
+                                      <tr>
+                                        <th className="px-3 py-2 text-left text-red-900 font-semibold border-b border-red-200">
+                                          Row #
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-red-900 font-semibold border-b border-red-200">
+                                          Reference ID
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-red-900 font-semibold border-b border-red-200">
+                                          Customer ID
+                                        </th>
+                                        <th className="px-3 py-2 text-left text-red-900 font-semibold border-b border-red-200">
+                                          Error
+                                        </th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="bg-white">
+                                      {upload.error_details.map((error, idx) => (
+                                        <tr key={idx} className="border-b border-red-100">
+                                          <td className="px-3 py-2 text-red-900 font-mono">
+                                            {error.row}
+                                          </td>
+                                          <td className="px-3 py-2 text-red-800 font-mono">
+                                            {error.reference_id || '-'}
+                                          </td>
+                                          <td className="px-3 py-2 text-red-800 font-mono">
+                                            {error.customer_id || '-'}
+                                          </td>
+                                          <td className="px-3 py-2 text-red-800">
+                                            {error.error}
+                                          </td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
                               </div>
                             )}
                             {upload.csv_file_url && (

@@ -16,27 +16,37 @@ class ProcessTransactionUploadJob < ApplicationJob
 
       processed_count = 0
       failed_count = 0
-      errors = []
+      error_details = []
 
       csv_data.each_with_index do |row, index|
+        row_number = index + 2 # Account for header row and 1-based indexing
         begin
-          process_transaction_row(transaction_upload.organization, row)
+          process_transaction_row(transaction_upload.organization, row, row_number)
           processed_count += 1
         rescue => e
           failed_count += 1
-          errors << "Row #{index + 2}: #{e.message}"
-          Rails.logger.error("Error processing row #{index + 2}: #{e.message}")
+          error_detail = {
+            row: row_number,
+            reference_id: row['reference_id']&.strip,
+            customer_id: row['customer_id']&.strip,
+            error: e.message
+          }
+          error_details << error_detail
+          Rails.logger.error("Error processing row #{row_number}: #{e.message}")
         end
       end
 
       transaction_upload.update!(
         processed_rows: processed_count,
-        failed_rows: failed_count
+        failed_rows: failed_count,
+        error_details: error_details
       )
 
       # If any rows failed, mark as errored
       if failed_count > 0
-        transaction_upload.update!(error_message: errors.join("\n"))
+        # Create summary error message
+        error_message = "#{failed_count} row(s) failed to process. See error_details for specifics."
+        transaction_upload.update!(error_message: error_message)
         transaction_upload.mark_errored!
       else
         transaction_upload.mark_processed!
@@ -52,7 +62,7 @@ class ProcessTransactionUploadJob < ApplicationJob
 
   private
 
-  def process_transaction_row(organization, row)
+  def process_transaction_row(organization, row, row_number)
     # Extract data from CSV row
     customer_reference_id = row['customer_id']&.strip
     payment_date_str = row['payment_date']&.strip
@@ -81,13 +91,16 @@ class ProcessTransactionUploadJob < ApplicationJob
     # Find or create customer
     customer = cohort.customers.find_or_create_by!(reference_id: customer_reference_id)
 
-    # Create transaction (will fail if duplicate reference_id exists)
-    Txn.create!(
+    # Find or create transaction (idempotent - will update if exists)
+    txn = Txn.find_or_initialize_by(
       organization: organization,
-      customer: customer,
-      reference_id: txn_reference_id,
-      payment_date: payment_date,
-      amount: amount
+      reference_id: txn_reference_id
     )
+
+    # Update transaction attributes
+    txn.customer = customer
+    txn.payment_date = payment_date
+    txn.amount = amount
+    txn.save!
   end
 end

@@ -170,11 +170,19 @@ export interface Txn {
   updated_at: string
 }
 
+export interface TransactionUploadError {
+  row: number
+  reference_id: string | null
+  customer_id: string | null
+  error: string
+}
+
 export interface TransactionUpload {
   id: number
   organization_id: number
   status: 'submitted' | 'processing' | 'processed' | 'errored'
   error_message: string | null
+  error_details: TransactionUploadError[]
   total_rows: number | null
   processed_rows: number | null
   failed_rows: number | null
