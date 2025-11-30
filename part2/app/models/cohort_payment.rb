@@ -82,7 +82,7 @@ class CohortPayment < ApplicationRecord
   end
 
   def payment_percent_of_spend
-    return 0 if cohort.actual_spend.zero?
+    return 0 if cohort.actual_spend.nil? || cohort.actual_spend.zero?
     (total_revenue / cohort.actual_spend * 100).round(2)
   end
 

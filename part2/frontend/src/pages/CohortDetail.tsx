@@ -153,7 +153,7 @@ export default function CohortDetail() {
                     {formatCurrency(payment.total_revenue)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {payment.payment_percent_of_spend.toFixed(2)}%
+                    {payment.payment_percent_of_spend != null ? payment.payment_percent_of_spend.toFixed(2) : '0.00'}%
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     {payment.threshold_hit ? (

@@ -151,7 +151,7 @@ export interface CohortPayment {
   total_owed: number
   total_paid: number
   outstanding_amount: number
-  payment_percent_of_spend: number
+  payment_percent_of_spend: number | null
   finalized_at: string | null
   settled_at: string | null
   created_at: string
